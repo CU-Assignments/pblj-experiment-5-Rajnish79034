@@ -1,0 +1,167 @@
+//Question no. : 1
+import java.io.*;
+
+class Student implements Serializable {
+    int id;
+    String name;
+    double gpa;
+
+    public Student(int id, String name, double gpa) {
+        this.id = id;
+        this.name = name;
+        this.gpa = gpa;
+    }
+
+    public void displayStudentDetails() {
+        System.out.println("Student ID: " + id);
+        System.out.println("Student Name: " + name);
+        System.out.println("Student GPA: " + gpa);
+    }
+}
+
+public class StudentSerializationDemo {
+
+    public static void serializeStudent(Student student, String filename) {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename))) {
+            out.writeObject(student);
+            System.out.println("Student object serialized successfully.");
+        } catch (FileNotFoundException e) {
+            System.err.println("File not found: " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("IOException occurred during serialization: " + e.getMessage());
+        }
+    }
+
+    public static Student deserializeStudent(String filename) {
+        Student student = null;
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename))) {
+            student = (Student) in.readObject();
+            System.out.println("Student object deserialized successfully.");
+        } catch (FileNotFoundException e) {
+            System.err.println("File not found: " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("IOException occurred during deserialization: " + e.getMessage());
+        } catch (ClassNotFoundException e) {
+            System.err.println("Class not found: " + e.getMessage());
+        }
+        return student;
+    }
+
+    public static void main(String[] args) {
+        Student student = new Student(80008, "rajnish", 7.2);
+
+        String filename = "student.ser";
+        serializeStudent(student, filename);
+
+        Student deserializedStudent = deserializeStudent(filename);
+
+        if (deserializedStudent != null) {
+            deserializedStudent.displayStudentDetails();
+        }
+    }
+}
+
+
+
+
+//Question no. : 2
+import java.io.*;
+import java.util.*;
+
+class Employee implements Serializable {
+    private String name;
+    private int id;
+    private String designation;
+    private double salary;
+
+    public Employee(String name, int id, String designation, double salary) {
+        this.name = name;
+        this.id = id;
+        this.designation = designation;
+        this.salary = salary;
+    }
+
+    @Override
+    public String toString() {
+        return "Employee{" +
+                "name='" + name + '\'' +
+                ", id=" + id +
+                ", designation='" + designation + '\'' +
+                ", salary=" + salary +
+                '}';
+    }
+}
+
+public class EmployeeManagementSystem {
+    private static final String FILE_NAME = "employees.dat";
+    private static List<Employee> employees = new ArrayList<>();
+    private static Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) {
+        int choice;
+        do {
+            System.out.println("Employee Management System");
+            System.out.println("1. Add an Employee");
+            System.out.println("2. Display All Employees");
+            System.out.println("3. Exit");
+            System.out.print("Enter your choice: ");
+            choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            switch (choice) {
+                case 1:
+                    addEmployee();
+                    break;
+                case 2:
+                    displayAllEmployees();
+                    break;
+                case 3:
+                    System.out.println("Exiting...");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please enter 1, 2, or 3.");
+            }
+        } while (choice != 3);
+
+        // Save employees to file before exiting
+        saveEmployeesToFile();
+    }
+
+    private static void addEmployee() {
+        System.out.print("Enter employee name: ");
+        String name = scanner.nextLine();
+        System.out.print("Enter employee id: ");
+        int id = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
+        System.out.print("Enter employee designation: ");
+        String designation = scanner.nextLine();
+        System.out.print("Enter employee salary: ");
+        double salary = scanner.nextDouble();
+        scanner.nextLine(); // Consume newline
+
+        Employee employee = new Employee(name, id, designation, salary);
+        employees.add(employee);
+        System.out.println("Employee added successfully!");
+    }
+
+    private static void displayAllEmployees() {
+        if (employees.isEmpty()) {
+            System.out.println("No employees to display.");
+        } else {
+            System.out.println("List of Employees:");
+            for (Employee employee : employees) {
+                System.out.println(employee);
+            }
+        }
+    }
+
+    private static void saveEmployeesToFile() {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
+            oos.writeObject(employees);
+            System.out.println("Employees saved to file: " + FILE_NAME);
+        } catch (IOException e) {
+            System.err.println("Error saving employees to file: " + e.getMessage());
+        }
+    }
+}
+
